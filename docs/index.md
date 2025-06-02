@@ -1,11 +1,11 @@
-# AuditHub Documentation
+# Welcome to AuditHub
 
-Welcome to the AuditHub docs.
+AuditHub is a CLI tool for GitHub repository health checks.
 
-## Getting Started
+## How It Works
 
-1. Clone the repo
-2. Install dependencies
-3. Run the tool
+- Run `audit.py` with your GitHub token
+- It checks for stale branches, old pull requests, and missing docs
+- Get instant JSON reports
 
-More features coming soon!
+[See the GitHub Repo](https://github.com/yourusername/AuditHub)

@@ -1,19 +1,21 @@
-# AuditHub
+# AuditHub 🕵️‍♂️
 
-AuditHub is a lightweight Python CLI tool that checks the health of your GitHub repositories.
+**Your lightweight GitHub repository health checker.**
 
-## Features
+AuditHub helps developers and teams quickly identify issues like:
+- 🗃️ Unused or stale branches
+- ⌛ Old pull requests
+- ❌ Missing README or LICENSE
+- 🧪 Inactive repositories
 
-- Detects missing README or license
-- Flags stale pull requests (older than 30 days)
-- Outputs a clean JSON audit report
+## 🚀 Features
+- Connects to your GitHub repos using a personal access token
+- Generates a JSON or Markdown report
+- Simple CLI usage with Python
 
-## Usage
+## 🛠️ Getting Started
 
+### 1. Clone the repo
 ```bash
-python audit.py --token YOUR_GITHUB_TOKEN --owner your_org --repo your_repo
-```
-
-## License
-
-MIT
+git clone https://github.com/yourusername/AuditHub.git
+cd AuditHub
