@@ -1,52 +1,42 @@
-import argparse
 import requests
+import argparse
 import json
-from datetime import datetime, timedelta
 
+GITHUB_API = "https://api.github.com"
 
 def get_headers(token):
-    return {'Authorization': f'token {token}'}
+    return {"Authorization": f"token {token}"}
 
-
-def get_repo_metadata(owner, repo, headers):
-    url = f"https://api.github.com/repos/{owner}/{repo}"
-    r = requests.get(url, headers=headers)
-    data = r.json()
-    return {
-        "has_readme": data.get("has_wiki", False),
-        "license": data.get("license", {}).get("name", "None")
-    }
-
-
-def get_stale_prs(owner, repo, headers):
-    url = f"https://api.github.com/repos/{owner}/{repo}/pulls?state=open"
-    r = requests.get(url, headers=headers)
-    prs = r.json()
-    stale_prs = []
-    cutoff = datetime.now(datetime.timezone.utc) - timedelta(days=30)
-    for pr in prs:
-        updated_at = datetime.strptime(pr["updated_at"], "%Y-%m-%dT%H:%M:%SZ")
-        if updated_at < cutoff:
-            stale_prs.append(pr["html_url"])
-    return stale_prs
-
-
-def audit_repo(token, owner, repo):
+def check_repo_health(token, repo):
     headers = get_headers(token)
-    metadata = get_repo_metadata(owner, repo, headers)
-    stale_prs = get_stale_prs(owner, repo, headers)
-    report = {
-        "repo": f"{owner}/{repo}",
-        "metadata": metadata,
-        "stale_pull_requests": stale_prs
-    }
-    print(json.dumps(report, indent=2))
+    report = {"repo": repo}
 
+    # Get branches
+    branches = requests.get(f"{GITHUB_API}/repos/{repo}/branches", headers=headers).json()
+    report["branch_count"] = len(branches)
+
+    # Check open PRs > 30 days old
+    prs = requests.get(f"{GITHUB_API}/repos/{repo}/pulls?state=open", headers=headers).json()
+    old_prs = [pr["html_url"] for pr in prs if "created_at" in pr and is_old(pr["created_at"])]
+    report["open_prs_over_30_days"] = old_prs
+
+    # Check for README
+    contents = requests.get(f"{GITHUB_API}/repos/{repo}/contents", headers=headers).json()
+    filenames = [f["name"].lower() for f in contents if "name" in f]
+    report["missing_readme"] = "readme.md" not in filenames
+
+    return report
+
+def is_old(date_str):
+    from datetime import datetime, timedelta
+    created = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+    return (datetime.utcnow() - created) > timedelta(days=30)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="AuditHub CLI")
+    parser = argparse.ArgumentParser()
     parser.add_argument("--token", required=True, help="GitHub token")
-    parser.add_argument("--owner", required=True, help="GitHub owner/org")
-    parser.add_argument("--repo", required=True, help="GitHub repository")
+    parser.add_argument("--repo", required=True, help="Repo in owner/name format")
     args = parser.parse_args()
-    audit_repo(args.token, args.owner, args.repo)
+
+    output = check_repo_health(args.token, args.repo)
+    print(json.dumps(output, indent=2))

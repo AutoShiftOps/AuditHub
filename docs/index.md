@@ -8,4 +8,4 @@ AuditHub is a CLI tool for GitHub repository health checks.
 - It checks for stale branches, old pull requests, and missing docs
 - Get instant JSON reports
 
-[See the GitHub Repo](https://github.com/yourusername/AuditHub)
+[See the GitHub Repo](https://github.com/devops-den/AuditHub)
