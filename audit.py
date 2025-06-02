@@ -3,8 +3,10 @@ import requests
 import json
 from datetime import datetime, timedelta
 
+
 def get_headers(token):
     return {'Authorization': f'token {token}'}
+
 
 def get_repo_metadata(owner, repo, headers):
     url = f"https://api.github.com/repos/{owner}/{repo}"
@@ -14,6 +16,7 @@ def get_repo_metadata(owner, repo, headers):
         "has_readme": data.get("has_wiki", False),
         "license": data.get("license", {}).get("name", "None")
     }
+
 
 def get_stale_prs(owner, repo, headers):
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls?state=open"
@@ -27,6 +30,7 @@ def get_stale_prs(owner, repo, headers):
             stale_prs.append(pr["html_url"])
     return stale_prs
 
+
 def audit_repo(token, owner, repo):
     headers = get_headers(token)
     metadata = get_repo_metadata(owner, repo, headers)
@@ -37,6 +41,7 @@ def audit_repo(token, owner, repo):
         "stale_pull_requests": stale_prs
     }
     print(json.dumps(report, indent=2))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="AuditHub CLI")
