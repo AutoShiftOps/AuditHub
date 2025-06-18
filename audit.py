@@ -47,8 +47,13 @@ def check_repo_health(token, repo):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--token", required=True, help="GitHub token")
-    parser.add_argument("--repo", required=True, help="Repo in owner/name format")
+    parser.add_argument(
+        "--token", required=True, help="GitHub token"
+    )
+    parser.add_argument(
+        "--repo", required=True,
+        help="Repo in owner/name format"
+    )
     args = parser.parse_args()
 
     output = check_repo_health(args.token, args.repo)
