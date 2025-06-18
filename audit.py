@@ -27,14 +27,20 @@ def check_repo_health(token, repo):
     # Check open PRs > 30 days old
     prs_url = f"{GITHUB_API}/repos/{repo}/pulls?state=open"
     prs = requests.get(prs_url, headers=headers).json()
-    old_prs = [pr["html_url"] for pr in prs if "created_at" in pr and is_old(pr["created_at"])]
+    old_prs = [
+        pr["html_url"]
+        for pr in prs
+        if "created_at" in pr and is_old(pr["created_at"])
+    ]
     report["open_prs_over_30_days"] = old_prs
 
     # Check for README
     contents_url = f"{GITHUB_API}/repos/{repo}/contents"
     contents = requests.get(contents_url, headers=headers).json()
     filenames = [f["name"].lower() for f in contents if "name" in f]
-    report["missing_readme"] = "readme.md" not in filenames
+    report["missing_readme"] = (
+        "readme.md" not in filenames
+    )
 
     return report
 
